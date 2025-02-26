@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------
-# Description: This file contains the functions to read the data from the files.
+# Description: This module is used to read and analyze the data from LS372.
 # --------------------------------------------------------------------
 
 import numpy as np
@@ -7,14 +7,28 @@ import matplotlib.pyplot as plt
 from . import inductor
 from . import capacitor
 
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
+config = {
+    "font.family":'serif',
+    "font.size":12,
+    "mathtext.fontset":'stix',
+    "font.serif": ['STIXGeneral']
+}
+plt.rcParams.update(config)
+cmap = ['#6F6F6F','#547BB4','#C0321A','#DD7C4F','#6C61AF']
+
 class data():
     '''
     Data class to read the data from the files and store them in the class variables.
     Class Variables:
-        scale: np.array: The scale of the data.
+        input: np.array: The input voltage.
         frequncy: np.array: frequency measured.
         voltage: np.array: voltage measured.
         phase: np.array: phase measured.
+        title: str: The title of the plot.
+        inductance_expected: float: The expected inductance of the test component.
+        capacitance_expected: float: The expected capacitance of the test component.
     '''
     def __init__(self,filepath,title,oscilation_freq=1e6,ignore_first=0,ignore_last=-1):
         '''
@@ -53,7 +67,7 @@ class data():
 
             fig.tight_layout()
 
-            axes[0].set_ylabel('Z [$\\rm \Omega$]')
+            axes[0].set_ylabel('Z [$\\rm \\Omega$]')
             axes[1].set_ylabel('Phase [$deg$]')
             axes[1].set_xlabel('Frequency [kHz]')
 
