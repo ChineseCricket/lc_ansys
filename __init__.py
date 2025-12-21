@@ -4,5 +4,5 @@
 # Version: 0.1
 # Description: The main module of the package.
 
-from . import ls372
+from . import srs865
 from . import vna

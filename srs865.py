@@ -42,7 +42,7 @@ class data():
         self.input = data[0]
         self.frequency = data[1]
         self.voltage = data[2]
-        self.phase = data[3]
+        self.phase = data[3] - data[3][data[2].argmin()]
         self.title = title
         self.inductance_expected = 3.3257e-6
         self.capacitance_expected = 1/(4*np.pi**2*oscilation_freq**2*self.inductance_expected)
@@ -53,33 +53,38 @@ class data():
         def __init__(self,data):
             self.data = data
 
-        def impedance(self,R_s=2064,filepath=None):
+        def impedance(self,R_s=2064,filepath=None,mode='dif',plot=True):
             '''
             Calculate and plot the measured impedance curve.
             Model used: Z = (U/U_M-1)^-1 R_shunt
             '''
-            self.data.impedance = ((self.data.input*2/(self.data.voltage*np.exp(np.deg2rad(self.data.phase)*1j))-1)**-1)*R_s
-
-            fig,axes = plt.subplots(2,1,sharex=True)
-
-            axes[0].plot(self.data.frequency/1e3,np.abs(self.data.impedance))
-            axes[1].plot(self.data.frequency/1e3,np.rad2deg(np.angle(self.data.impedance)))
-
-            fig.tight_layout()
-
-            axes[0].set_ylabel('Z [$\\rm \\Omega$]')
-            axes[1].set_ylabel('Phase [$deg$]')
-            axes[1].set_xlabel('Frequency [kHz]')
-
-            axes[1].set_xscale('log')
-            axes[0].set_yscale('log')
-
-            axes[0].set_title(self.data.title)
+            if mode == 'dif':
+                self.data.impedance = ((self.data.input*2/(self.data.voltage*np.exp(np.deg2rad(self.data.phase)*1j))-1)**-1)*R_s
             
-            if filepath:
-                plt.savefig(filepath)
+            elif mode == 'abs':
+                self.data.impedance = ((self.data.input/(self.data.voltage*np.exp(np.deg2rad(self.data.phase)*1j))-1)**-1)*R_s
+
+            if plot:
+                fig,axes = plt.subplots(2,1,sharex=True)
+
+                axes[0].plot(self.data.frequency/1e3,np.abs(self.data.impedance))
+                axes[1].plot(self.data.frequency/1e3,np.rad2deg(np.angle(self.data.impedance)))
+
+                fig.tight_layout()
+
+                axes[0].set_ylabel('Z [$\\rm \\Omega$]')
+                axes[1].set_ylabel('Phase [$deg$]')
+                axes[1].set_xlabel('Frequency [kHz]')
+
+                axes[1].set_xscale('log')
+                axes[0].set_yscale('log')
+
+                axes[0].set_title(self.data.title)
+                
+                if filepath:
+                    plt.savefig(filepath)
             
-            return fig,axes
+                return fig,axes
         
         def resistance(self,filepath=None):
             '''

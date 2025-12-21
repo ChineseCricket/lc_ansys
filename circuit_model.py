@@ -5,7 +5,6 @@
 import numpy as np
 
 L_expected = 3.3257e-6
-Z0 = 50
 
 def Z_Res(f, L, C, Rs, Rp):
     Zc = 1/(1j*2*np.pi*f*C)
@@ -27,7 +26,7 @@ def S21_ind(f, Z0, L, Rs):
     Rc = 1j*2*np.pi*f*L + Rs
     return 2*Rc*Z0/(Z0**2+2*Rc*Z0)
 
-def simple_lorentzian(f, f0, Q, L):
+def simple_lorentzian(f, f0, Q, L,Z0):
     # a = Rs/4piL
     # b = Z0/8piL
     # Q = f0/2a
@@ -38,8 +37,20 @@ def simple_lorentzian(f, f0, Q, L):
     B = (f-f0)**2 + a**2
     return 10*np.log10(1/(1+A/B))
 
-def simple_ind(f, L):
+def simple_ind(f, L,Z0):
     Z_T = 1j*2*np.pi*f*L
     Z_L = Z_T*Z0/(Z_T+Z0)
     S = 2*Z_L/(Z0+Z_L)
     return 20*np.log10(S)   
+
+def S21_reduced(f, f0, Q, L, Z0, Z1):
+    # a = Rs/4piL
+    # b = Z0/8piL
+    # Q = f0/2a
+    # L = L_expected
+    a = f0/(2*Q)
+    b = Z0/(8*np.pi*L)
+    A = 4 * f**2 * (2*a*b+b**2)
+    B = (f**2-f0**2)**2 + 4*f**2*a**2
+    C = 20*np.log10(1+Z1/Z0)
+    return 10*np.log10(1/(1+A/B)) - C
