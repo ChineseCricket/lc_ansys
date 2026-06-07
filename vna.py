@@ -62,6 +62,14 @@ class data():
             self.frequency = raw_data['freq[Hz]']
             self.s21_scl = raw_data['db:Trc3_S21']
             self.s21_ang = raw_data['ang:Trc3_S21']
+        elif device == 'RS ZNL IMRE':
+            self.Z0 = 50
+            self.device = 'RS ZNL IMRE'
+            raw_data = pd.read_csv(filepath,sep=';',header=2,encoding='GBK')
+            self.frequency = raw_data['freq[Hz]']
+            s21_temp = raw_data['re:Trc7_S21']+1j*raw_data['im:Trc7_S21']
+            self.s21_scl = 20*np.log10(np.abs(s21_temp))
+            self.s21_ang = np.angle(s21_temp,True)
         elif device == 'RS ZNL20':
             self.Z0 = 50
             self.device = 'RS ZNL20'
@@ -82,8 +90,12 @@ class data():
             raw_data = pd.read_csv(filepath,sep=';',header=2,encoding='GBK')
             raw_data.drop('Unnamed: 9',axis=1,inplace=True)
             self.frequency = raw_data['freq[Hz]']
-            self.s21_scl = raw_data['db:Trc2_S12']
-            self.s21_ang = raw_data['ang:Trc2_S12']
+            try:
+                self.s21_scl = raw_data['db:Trc15_S21']
+                self.s21_ang = raw_data['ang:Trc15_S21']
+            except:
+                self.s21_scl = raw_data['db:Trc1_S21']
+                self.s21_ang = raw_data['ang:Trc1_S21']
         elif device == 'new':
             self.Z0 = 50
             self.device = 'KS N5232B'
@@ -98,6 +110,8 @@ class data():
                 self.s21_ang = raw_data['S21 Phase(°)']
             except:
                 pass
+        else:
+            raise ValueError('Invalid device. Please choose from "default", "RS ZNL IMRE", "RS ZNB", "RS ZNL20" or "new".')
         self.Z1 = Z1
         self.title = title
         self.analysis = self.analysis(self)
